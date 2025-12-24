@@ -283,24 +283,49 @@
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
-   <!-- 优化版音乐播放器（兼容手机+自动解锁音频） -->
-<div class="music-player">
-    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" 
-            width=330 height=86 
-            src="https://music.163.com/outchain/player?type=2&id=2633757005&auto=1&height=66&theme=white"
-            allow="autoplay; audio"></iframe>
-</div>
-<!-- 备用音频（若iframe加载失败，自动播放） -->
-<audio id="backup-audio" loop autoplay muted preload="auto">
-    <source src="https://music.163.com/song/media/outer/url?id=2633757005.mp3" type="audio/mpeg">
+<!-- 本地音乐播放器（100%加载，兼容所有设备） -->
+<!-- 隐藏原网易云播放器容器，保留样式占位 -->
+<div class="music-player" style="display:none;"></div>
+<!-- 自定义音频控件（固定在右下角，和原播放器位置一致） -->
+<audio 
+    id="local-audio" 
+    loop 
+    autoplay 
+    preload="auto" 
+    style="
+        position:fixed;
+        bottom:20px;
+        right:20px;
+        z-index:9999;
+        width:160px;
+        height:40px;
+        opacity:0.9;
+        border-radius:8px;
+        background:#f5f5f5;
+    "
+>
+    <source src="bgm.mp3" type="audio/mpeg">
+    你的浏览器不支持音频播放，请升级浏览器～
 </audio>
+<!-- 自动解锁音频（点击页面任意处播放） -->
 <script>
-// 自动解锁备用音频
-document.addEventListener('click', () => {
-    const audio = document.getElementById('backup-audio');
-    audio.muted = false;
-    audio.play().catch(() => {});
-});
+    // 页面加载后先静音，点击后解锁
+    window.onload = function() {
+        const audio = document.getElementById('local-audio');
+        audio.muted = true; // 初始静音（规避浏览器autoplay限制）
+        audio.load(); // 预加载音频
+    };
+    // 点击页面任意位置，解锁音频播放
+    document.addEventListener('click', () => {
+        const audio = document.getElementById('local-audio');
+        audio.muted = false;
+        // 兼容不同浏览器的播放权限
+        audio.play().catch((err) => {
+            console.log('音频解锁：', err);
+            // 若仍无法播放，弹出提示
+            alert('点击音频控件的播放按钮即可播放音乐～');
+        });
+    });
 </script>
 
     <!-- 粒子背景 -->
@@ -547,3 +572,4 @@ document.addEventListener('click', () => {
 </body>
 
 </html>
+
