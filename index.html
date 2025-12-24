@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 跨年</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Inter", "Microsoft Yahei", sans-serif;
+        }
+
+        /* ========== 核心优化：多色流体渐变背景（新增多种柔和色系） ========== */
+        body {
+            background: 
+                /* 多层径向渐变叠加，增加层次感 */
+                radial-gradient(circle at 20% 30%, rgba(252, 196, 228, 0.7) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(136, 216, 232, 0.6) 0%, transparent 40%),
+                radial-gradient(circle at 40% 80%, rgba(249, 231, 200, 0.5) 0%, transparent 40%),
+                /* 线性渐变增加更多柔和色系，过渡更自然 */
+                linear-gradient(135deg, 
+                    #e8c2e8 0%,    /* 淡紫粉 */
+                    #c2e8e8 25%,   /* 淡青 */
+                    #b4d8e7 50%,   /* 淡蓝 */
+                    #f9e7c8 75%,   /* 淡橙黄 */
+                    #f8d4b4 100%); /* 淡桃色 */
+            background-size: 200% 200%;
+            animation: fluidGradient 20s ease infinite;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        @keyframes fluidGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* ========== 网易云音乐播放器样式 ========== */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999; /* 确保播放器在最上层 */
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+            /* 如需隐藏播放器，取消下面两行注释 */
+            /* opacity: 0; */
+            /* pointer-events: none; */
+        }
+
+        /* ========== 倒计时容器（保留磨砂质感） ========== */
+        .countdown-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #212529;
+            text-align: center;
+            z-index: 10;
+            display: none;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+            padding: 2rem 3rem;
+            border-radius: 20px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .countdown-title {
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            margin-bottom: 1.5rem;
+            background: linear-gradient(90deg, #212529, #495057);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            font-weight: 600;
+        }
+
+        .countdown-box {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .countdown-item {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.1));
+            padding: 1.2rem 1.8rem;
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            min-width: 80px;
+        }
+
+        /* ========== 需求1：倒计时数字改为黑色（深灰黑更柔和） ========== */
+        .countdown-num {
+            font-size: clamp(1.8rem, 5vw, 3rem);
+            font-weight: 700;
+            color: #1a1a1a; /* 深灰黑，比纯黑更护眼 */
+            text-shadow: 0 2px 4px rgba(255, 255, 255, 0.5); /* 增加轻微阴影提升辨识度 */
+        }
+
+        .countdown-text {
+            font-size: clamp(0.8rem, 2vw, 1rem);
+            color: #495057;
+            margin-top: 0.3rem;
+            font-weight: 400;
+        }
+
+        /* ========== 需求3：2026新年标题优化（替换高级渐变，减少粉色） ========== */
+        .newyear-title {
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: clamp(3.5rem, 12vw, 7rem);
+            font-weight: 800;
+            /* 高级蓝紫青渐变，替代原有粉色系 */
+            background: linear-gradient(90deg, 
+                #6366f1, /* 紫蓝 */
+                #8b5cf6, /* 紫罗兰 */
+                #06b6d4, /* 青蓝 */
+                #14b8a6  /* 青绿 */
+            );
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            /* 优化阴影：更通透的冷色调阴影 */
+            text-shadow: 0 4px 20px rgba(255, 255, 255, 0.8), 
+                         0 2px 10px rgba(99, 102, 241, 0.6);
+            display: none;
+            z-index: 15;
+            animation: titleGlow 2s infinite alternate ease-in-out;
+            -webkit-text-stroke: 1px rgba(255, 255, 255, 0.7); /* 增强描边通透感 */
+        }
+
+        @keyframes titleGlow {
+            from {
+                opacity: 0.9;
+                transform: translate(-50%, -50%) scale(1);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1.08); /* 微调缩放，更自然 */
+            }
+        }
+
+        /* ========== 祝福卡片（保留原有效果） ========== */
+        .blessing-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: none;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+        .blessing-card {
+            position: absolute;
+            padding: 1rem 1.8rem;
+            border-radius: 16px;
+            color: #212529;
+            font-size: clamp(1rem, 2vw, 1.2rem);
+            font-weight: 500;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            animation: cardBomb 8s forwards ease-in-out;
+            background: linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 252, 0.95));
+        }
+
+        @keyframes cardBomb {
+            0% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.5) rotate(0deg);
+            }
+            10% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1.05) rotate(2deg);
+            }
+            80% { 
+                opacity: 1; 
+                transform: translate(-50%, -50%) scale(1) rotate(-1deg);
+            }
+            100% { 
+                opacity: 0; 
+                transform: translate(-50%, -50%) scale(0.8) rotate(0deg);
+            }
+        }
+
+        /* ========== 礼花特效（保留原有效果） ========== */
+        .fireworks {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+            display: none;
+        }
+
+        .firework-launch {
+            position: absolute;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to top, #ffd166, #ff8a00, #ffffff);
+            border-radius: 2px;
+            opacity: 0;
+            animation: fireworkLaunch 1.5s forwards ease-out;
+        }
+
+        .firework-particle {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            opacity: 0;
+            animation: fireworkBurst 2s forwards ease-out;
+        }
+
+        @keyframes fireworkLaunch {
+            0% {
+                height: 0;
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                height: var(--launch-height);
+                opacity: 0;
+                transform: translateY(-var(--launch-height));
+            }
+        }
+
+        @keyframes fireworkBurst {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.5) translate(var(--x-offset), var(--y-offset));
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.5) translate(calc(var(--x-offset) * 1.5), calc(var(--y-offset) * 1.5));
+            }
+        }
+
+        /* ========== 粒子背景 ========== */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #fcc4e4, #c2e8e8);
+            opacity: 0.6;
+            animation: particleFloat 8s infinite ease-in-out;
+        }
+
+        @keyframes particleFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(20px, -30px) scale(1.2); }
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+</head>
+<body>
+    <!-- 网易云音乐播放器 -->
+    <div class="music-player">
+        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=2633757005&auto=1&height=66"></iframe>
+    </div>
+
+    <!-- 粒子背景 -->
+    <div class="particles" id="particles-js"></div>
+
+    <!-- 倒计时容器 -->
+    <div class="countdown-container" id="countdown">
+        <div class="countdown-title">距离2026还有</div>
+        <div class="countdown-box">
+            <div class="countdown-item">
+                <div class="countdown-num" id="days">00</div>
+                <div class="countdown-text">天</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-num" id="hours">00</div>
+                <div class="countdown-text">时</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-num" id="minutes">00</div>
+                <div class="countdown-text">分</div>
+            </div>
+            <div class="countdown-item">
+                <div class="countdown-num" id="seconds">00</div>
+                <div class="countdown-text">秒</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 跨年标题 -->
+    <div class="newyear-title" id="newyearTitle">2026 新年快乐 ✨</div>
+
+    <!-- 祝福容器 -->
+    <div class="blessing-container" id="blessingBox"></div>
+
+    <!-- 烟花特效容器 -->
+    <div class="fireworks" id="fireworks"></div>
+
+    <script>
+        // 核心配置：2026年1月1日0点0分0秒
+        const TARGET_DATE = new Date(2026, 0, 1, 0, 0, 0);
+
+        // DOM元素
+        const countdownEl = document.getElementById('countdown');
+        const blessingBoxEl = document.getElementById('blessingBox');
+        const newyearTitleEl = document.getElementById('newyearTitle');
+        const fireworksEl = document.getElementById('fireworks');
+        const daysEl = document.getElementById('days');
+        const hoursEl = document.getElementById('hours');
+        const minutesEl = document.getElementById('minutes');
+        const secondsEl = document.getElementById('seconds');
+
+        // 35条跨年祝福语
+        const blessingTexts = [
+            "天冷了，多穿衣服 ❤️",
+            "地球online 版本2.0.2.6正式版更新🌍",
+            "你好 日历的第一页🗓️",
+            "𝓒𝓱𝓮𝓮𝓻𝓼 𝓽𝓸 𝓝𝓮𝔀 𝓨𝓮𝓪𝓻 ☃️",
+            "保持好心情 😊",
+            "学会爱自己，才能更好地爱别人 💓",
+            "2026，万事顺意 🎉",
+            "cheers🍻｜敬过往，敬自由，敬2026的无限可能",
+            "所求皆如愿，所行皆坦途 ✨",
+            "对的 错的 新的一年都过去了",
+            "愿新年，胜旧年 📆",
+            "怀民亦未寝  相与跨此年 🌸",
+            "新岁 有光 好运只多不少💯 🎈",
+            "新岁启封，奔赴新程 🚀",
+            "何其有幸，年岁并进 ✨",
+            "新年伊始，喜乐安宁 🎊",
+            "新年新景 爱意同行 🍜",
+            "归零，更新，重启，向上",
+            "honey,money,funny 🙏",
+            "有趣有盼，无灾无难 🎋",
+            "日子常新，未来不远 ✨",
+            "顺颂时祺，秋绥冬禧 🕊️",
+            "新的365天，也要充满热爱 ❤️",
+            "去岁千股皆如愿 今年万事定称心 ✨",
+            "慢品人间烟火色，闲观万事岁月长 🔥",
+            "所求皆如愿，所行化坦途 🌟",
+            "愿新年，有新光，有新方向 🧭",
+            "生活温暖顺心，其他别无他求 ☀️",
+            "人瘦点钱包鼓点，记住了别给我整反了✨",
+            "有𝐥𝐨𝐯𝐞有𝐦𝐨𝐧𝐞𝐲有𝐣𝐨𝐲 💨",
+            "all money back my home 🎇",
+            "🐍₂₀₂₅𓆱²⁰²⁶🐎 欢迎光临 🏞️",
+            "新将旧的封缄 🕰️",
+            "新年，愿我们都好在新的一年 💖",
+            "ጿ ኈ ቼ ዽ ጿ，奔赴下一场山海 🌊",
+            "👶🏾十二少祝你：天天开心 🤍"
+        ];
+
+        // 粒子背景配置
+        particlesJS('particles-js', {
+            particles: {
+                number: { value: window.innerWidth > 768 ? 80 : 40, density: { enable: true, value_area: 800 } },
+                color: { value: ['#fcc4e4', '#e8c2e8', '#c2e8e8', '#f9e7c8'] }, // 同步背景色系
+                shape: { type: 'circle' },
+                opacity: { value: 0.4, random: true, anim: { enable: true, speed: 0.2 } },
+                size: { value: 3, random: true, anim: { enable: true, speed: 1 } },
+                move: { enable: true, speed: 0.3, direction: 'none', random: true }
+            },
+            interactivity: {
+                events: { onhover: { enable: true, mode: 'grab' }, onclick: { enable: true, mode: 'push' } },
+                modes: { grab: { distance: 100, line_linked: { opacity: 0.2 } } }
+            }
+        });
+
+        // 🌟 优化后的时间判断逻辑（修复边界漏洞）
+        const now = new Date();
+        if (now < TARGET_DATE) {
+            // 未到2026年1月1日0点 → 显示倒计时
+            countdownEl.style.display = 'block';
+            startCountdown();
+        } else {
+            // 已跨年（无论年份是2025/2026）→ 直接显示新年特效
+            showNewYearEffect();
+        }
+
+        // 倒计时函数
+        function startCountdown() {
+            const countdownTimer = setInterval(() => {
+                const now = new Date();
+                const diff = TARGET_DATE - now;
+
+                if (diff <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownEl.style.display = 'none';
+                    showNewYearEffect();
+                    return;
+                }
+
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+                daysEl.innerText = padZero(days);
+                hoursEl.innerText = padZero(hours);
+                minutesEl.innerText = padZero(minutes);
+                secondsEl.innerText = padZero(seconds);
+            }, 1000);
+        }
+
+        // 补零函数
+        function padZero(num) {
+            return num < 10 ? `0${num}` : num;
+        }
+
+        // 跨年特效
+        function showNewYearEffect() {
+            newyearTitleEl.style.display = 'block';
+            blessingBoxEl.style.display = 'block';
+            fireworksEl.style.display = 'block';
+            
+            startBlessingBomb();
+            setInterval(() => {
+                createFirework(Math.random() * window.innerWidth);
+            }, 300);
+        }
+
+        // 祝福轰炸效果
+        function startBlessingBomb() {
+            setInterval(() => {
+                createBlessingCard();
+            }, 150);
+        }
+
+        // 创建单个祝福卡片
+        function createBlessingCard() {
+            const randomText = blessingTexts[Math.floor(Math.random() * blessingTexts.length)];
+            const card = document.createElement('div');
+            card.className = 'blessing-card';
+            
+            const x = Math.random() * window.innerWidth;
+            const y = Math.random() * window.innerHeight;
+            
+            // 同步背景多色系，让卡片更协调
+            const gradients = [
+                'linear-gradient(120deg, rgba(255, 255, 255, 0.95), rgba(255, 248, 252, 0.95))',
+                'linear-gradient(120deg, rgba(255, 240, 245, 0.95), rgba(252, 196, 228, 0.85))',
+                'linear-gradient(120deg, rgba(240, 255, 255, 0.95), rgba(194, 232, 232, 0.85))',
+                'linear-gradient(120deg, rgba(255, 250, 240, 0.95), rgba(249, 231, 200, 0.85))'
+            ];
+            card.style.background = gradients[Math.floor(Math.random() * gradients.length)];
+            card.style.left = `${x}px`;
+            card.style.top = `${y}px`;
+            card.style.transform = `translate(-50%, -50%)`;
+            card.style.animationDelay = `${Math.random() * 0.5}s`;
+            
+            card.innerText = randomText;
+            blessingBoxEl.appendChild(card);
+            createFirework(x);
+            
+            setTimeout(() => {
+                card.remove();
+            }, 8000);
+        }
+
+        // 礼花效果
+        function createFirework(xPos) {
+            const launch = document.createElement('div');
+            launch.className = 'firework-launch';
+            const launchHeight = 200 + Math.random() * 400;
+            launch.style.left = `${xPos}px`;
+            launch.style.setProperty('--launch-height', `${launchHeight}px`);
+            fireworksEl.appendChild(launch);
+            
+            setTimeout(() => {
+                const particleCount = 30 + Math.floor(Math.random() * 20);
+                // 同步标题渐变色系，让礼花更协调
+                const colors = ['#6366f1', '#8b5cf6', '#06b6d4', '#14b8a6', '#ffd166', '#ffffff', '#ff8a00'];
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.className = 'firework-particle';
+                    
+                    const angle = (i / particleCount) * Math.PI * 2;
+                    const distance = 30 + Math.random() * 80;
+                    const xOffset = Math.cos(angle) * distance;
+                    const yOffset = Math.sin(angle) * distance;
+                    
+                    particle.style.left = `${xPos}px`;
+                    particle.style.top = `${window.innerHeight - launchHeight}px`;
+                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    particle.style.setProperty('--x-offset', `${xOffset}px`);
+                    particle.style.setProperty('--y-offset', `${yOffset}px`);
+                    particle.style.width = `${2 + Math.random() * 8}px`;
+                    particle.style.height = particle.style.width;
+                    particle.style.animationDelay = `${Math.random() * 0.5}s`;
+                    
+                    fireworksEl.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        particle.remove();
+                    }, 2000);
+                }
+                
+                setTimeout(() => {
+                    launch.remove();
+                }, 500);
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
