@@ -283,10 +283,25 @@
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
-    <!-- 网易云音乐播放器 -->
-    <div class="music-player">
-        <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" width=330 height=86 src="//music.163.com/outchain/player?type=2&id=2633757005&auto=1&height=66"></iframe>
-    </div>
+   <!-- 优化版音乐播放器（兼容手机+自动解锁音频） -->
+<div class="music-player">
+    <iframe frameborder="no" border="0" marginwidth="0" marginheight="0" 
+            width=330 height=86 
+            src="https://music.163.com/outchain/player?type=2&id=2633757005&auto=1&height=66&theme=white"
+            allow="autoplay; audio"></iframe>
+</div>
+<!-- 备用音频（若iframe加载失败，自动播放） -->
+<audio id="backup-audio" loop autoplay muted preload="auto">
+    <source src="https://music.163.com/song/media/outer/url?id=2633757005.mp3" type="audio/mpeg">
+</audio>
+<script>
+// 自动解锁备用音频
+document.addEventListener('click', () => {
+    const audio = document.getElementById('backup-audio');
+    audio.muted = false;
+    audio.play().catch(() => {});
+});
+</script>
 
     <!-- 粒子背景 -->
     <div class="particles" id="particles-js"></div>
@@ -530,4 +545,5 @@
         }
     </script>
 </body>
+
 </html>
