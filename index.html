@@ -283,7 +283,6 @@
     <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
 </head>
 <body>
-<!-- 👇👇👇 替换后的新代码 👇👇👇 -->
 <!-- 多首音乐随机播放（隐藏原播放器占位） -->
 <div class="music-player" style="display:none;"></div>
 <!-- 音频核心控件（可显示/隐藏，后台播放） -->
@@ -304,46 +303,50 @@
     "
 >
     你的浏览器不支持音频播放，请升级浏览器～
-</audio>
+
 
 <script>
-// 步骤1：定义音乐列表（包含你上传的所有MP3，保留原bgm.mp3，新增的补充在这里）
+// ✅ 步骤1：定义你的4首音乐列表（固定4首循环）
 const musicList = [
-    "bgm.mp3",   // 你原来的音乐（无需改动）
-    "bgm1.mp3",  // 新增的第二首（按需添加/删除）
-    "bgm2.mp3",  // 新增的第三首（按需添加/删除）
-    "bgm3.mp3"   // 新增的第四首（按需添加/删除）
+    "bgm.mp3",   // 第1首
+    "bgm1.mp3",  // 第2首
+    "bgm2.mp3",  // 第3首
+    "bgm3.mp3"   // 第4首
 ];
+let lastIndex = -1; // ✅ 关键：记录上一次播放的歌曲索引，初始值-1（表示无）
 
-// 步骤2：随机选一首音乐（核心函数，复用）
+// ✅ 核心升级：随机选歌【排除上一首】，从剩余3首里抽
 function getRandomMusic() {
-    const randomIndex = Math.floor(Math.random() * musicList.length);
+    let randomIndex;
+    // 循环随机，直到抽到和上一首不同的索引
+    do {
+        randomIndex = Math.floor(Math.random() * musicList.length);
+    } while (randomIndex === lastIndex);
+    // 更新上一首索引，供下一次判断
+    lastIndex = randomIndex;
+    // 返回选中的音乐文件名
     return musicList[randomIndex];
 }
 
-// 步骤3：切换播放新的随机音乐（自动切/双击切都调用这个函数）
+// ✅ 切换播放新的随机音乐（自动切/双击切共用）
 function playRandomMusic() {
     const audio = document.getElementById('random-audio');
-    // 停止当前播放的音乐
-    audio.pause();
-    // 选新的随机音乐
-    const newMusic = getRandomMusic();
-    audio.src = newMusic;
-    // 加载并播放新音乐（保留静音状态，点击后解锁）
+    audio.pause();          // 停止当前播放
+    const newMusic = getRandomMusic(); // 调用【排除上一首】的随机函数
+    audio.src = newMusic;   // 加载新音乐
     audio.load();
-    audio.play().catch(() => {}); // 兼容浏览器权限
+    audio.play().catch(() => {});
 }
 
-// 步骤4：页面加载初始化
+// ✅ 页面加载初始化
 window.onload = function() {
     const audio = document.getElementById('random-audio');
-    audio.muted = true; // 初始静音（规避autoplay限制）
-    // 加载第一首随机音乐（仅加载，不播放，等点击解锁）
-    audio.src = getRandomMusic();
+    audio.muted = true;     // 初始静音（规避浏览器限制）
+    audio.src = getRandomMusic(); // 首次随机选歌（无历史，直接抽）
     audio.load();
 };
 
-// 步骤5：点击页面任意处 → 解锁静音并播放（首次播放）
+// ✅ 点击页面任意处 → 解锁静音并播放
 document.addEventListener('click', () => {
     const audio = document.getElementById('random-audio');
     if (audio.muted) {
@@ -355,20 +358,18 @@ document.addEventListener('click', () => {
     }
 });
 
-// 步骤6：双击页面任意处 → 立刻切换下一首随机音乐
+// ✅ 双击页面 → 立刻切歌（排除上一首）
 document.addEventListener('dblclick', (e) => {
-    e.preventDefault(); // 防止双击选中文字等干扰
+    e.preventDefault(); // 防止双击选文字
     playRandomMusic();
-    // 可选：给用户反馈（不想弹提示就删掉这行）
-    alert('已切换下一首BGM🎵');
+    alert('已切换下一首BGM🎵'); // 不想弹提示可删掉这行
 });
 
-// 步骤7：音乐播放完毕 → 自动切换下一首随机音乐
+// ✅ 歌曲播放完毕 → 自动切歌（排除上一首）
 document.getElementById('random-audio').addEventListener('ended', function() {
     playRandomMusic();
 });
 </script>
-<!-- 👆👆👆 替换后的新代码 👆👆👆 -->
 
     <!-- 粒子背景 -->
     <div class="particles" id="particles-js"></div>
@@ -614,5 +615,6 @@ document.getElementById('random-audio').addEventListener('ended', function() {
 </body>
 
 </html>
+
 
 
